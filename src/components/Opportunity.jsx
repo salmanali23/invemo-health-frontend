@@ -68,6 +68,16 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
     setOpportunities([...newOpps]);
   };
 
+  const parseDate = (value) => {
+    return new Date(value).toLocaleString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   const handleClickEdit = () => {
     toggleEditOpportunityModalOpen(true);
   };
@@ -126,8 +136,9 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
               {opportunity?.stage_history?.map((stage, index) => (
                 <div key={index}>
                   {Object.entries(stage).map(([key, value]) => (
-                    <Typography key={key} variant="body2" color="textSecondary">
-                      {key}: {value}
+                    <Typography
+                      key={key} variant="body2" color="textSecondary" sx={{ display: 'inline',  whiteSpace: 'nowrap'  }}>
+                      {key}: {parseDate(value)}
                     </Typography>
                   ))}
                 </div>
