@@ -308,7 +308,6 @@ const AddMemberModal = ({ isVisible, onClose }) => {
             >
               <MenuItem value="male">{t('Male')}</MenuItem>
               <MenuItem value="female">{t('Female')}</MenuItem>
-              <MenuItem value="other">{t('Other')}</MenuItem>
             </TextField>
             <TextField
               id="dob"

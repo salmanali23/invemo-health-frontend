@@ -97,12 +97,12 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
           <div>
             <Typography fontSize={14}>
               {' '}
-              {(opportunity?.doctor?.first_name || '') +
+              {(opportunity?.patient?.first_name || '') +
                 ' ' +
-                (opportunity?.doctor?.last_name || '')}
+                (opportunity?.patient?.last_name || '')}
             </Typography>
             <Typography fontSize={12} color="#4D4D4D">
-              {opportunity?.patient?.gender + ', ' + opportunity?.patient?.age}
+              {opportunity?.patient?.gender ? opportunity.patient.gender.charAt(0).toUpperCase() + opportunity.patient.gender.slice(1) : ''}, {opportunity?.patient?.age} years old
             </Typography>
           </div>
         </CardHeaderStyle>

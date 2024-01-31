@@ -24,8 +24,10 @@ const SubHeader = styled.div`
 
   @media (max-width: 767px) {
     padding: 10px;
+    flex-direction:column;
   }
 `;
+
 
 const ColumnsContainer = styled.div`
   display: flex;
@@ -86,6 +88,7 @@ export default function PatientBoard() {
         });
 
         filteredOpportunites.forEach((data) => {
+          console.log(data)
           const stages = data?.stage_history;
           if (stages) {
             const lastStage = stages[stages.length - 1];
@@ -142,11 +145,11 @@ export default function PatientBoard() {
         <Typography fontSize={22} fontWeight={600}>
           {t('Patients')}
         </Typography>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px'}}>
           <Button
             variant="contained"
             onClick={handleOpenAddMember}
-            style={{ margin: '10px', borderRadius: '20px' }}
+            style={{ borderRadius: '20px' }}
           >
             {[t('Add'), t('Member')].join(' ')}
           </Button>
@@ -187,8 +190,6 @@ export default function PatientBoard() {
                 paddingRight: 0,
                 background: 'white',
               },
-              width: 500,
-              maxWidth: '100%',
             }}
             onChange={(e) => {
               setSearchValue(e.target.value);
