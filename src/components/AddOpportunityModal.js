@@ -1,7 +1,9 @@
+import React from 'react';
 import { useContext } from 'react';
 import { useFormik } from 'formik';
 import styled from 'styled-components';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import DeleteIcon
 import IconButton from '@mui/material/IconButton';
 import Modal from 'react-modal';
 import * as Yup from 'yup';
@@ -13,7 +15,9 @@ import {
   Button,
   TextField,
   FormHelperText,
+  Typography,
 } from '@mui/material';
+import DateTimePicker from './DateTimePicker';
 import { createOpportunities, updateOpportunity } from '../services/api';
 import { AppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +46,13 @@ const AddOpportunityModal = ({
 }) => {
   const { opportunities, setOpportunities } = useContext(AppContext);
   const { t } = useTranslation();
+
+  const updateStageHistory = (keyToUpdate, index, date) => {
+    if (isEdit) {
+      formik.values.stageHistory[index][keyToUpdate] = getDefaultDateTime(date);
+    }
+    return formik.values.stageHistory;
+  };
   const formik = useFormik({
     initialValues: {
       procedureName: opportunity?.procedure_name,
@@ -90,6 +101,24 @@ const AddOpportunityModal = ({
       }
     },
   });
+
+  const handleDelete = (index) => {
+    formik.values.stageHistory.splice(
+      index,
+      formik.values.stageHistory.length - index,
+    );
+    formik.setFieldValue('stageHistory', formik.values.stageHistory);
+  };
+
+  const getDefaultDateTime = (value) => {
+    const newDateValue = new Date(value);
+    const year = newDateValue.getFullYear();
+    const month = `${newDateValue.getMonth() + 1}`.padStart(2, '0');
+    const day = `${newDateValue.getDate()}`.padStart(2, '0');
+    const hours = `${newDateValue.getHours()}`.padStart(2, '0');
+    const minutes = `${newDateValue.getMinutes()}`.padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   return (
     <Modal
@@ -213,6 +242,47 @@ const AddOpportunityModal = ({
                 </div>
               ) : null}
             </FormHelperText>
+          </FormControl>
+        </div>
+        <div>
+          <FormControl>
+            {isEdit ? (
+              formik.values.stageHistory.map((stage, index) =>
+                Object.entries(stage).map(([key, value]) => (
+                  <div
+                    key={key}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      margin: 2,
+                    }}
+                  >
+                    <Typography sx={{ marginRight: 'auto' }}>
+                      {key}:{' '}
+                    </Typography>
+                    <DateTimePicker
+                      value={getDefaultDateTime(value) || ''}
+                      onChange={(date) => {
+                        formik.setFieldValue(
+                          'stageHistory',
+                          updateStageHistory(key, index, date),
+                        );
+                      }}
+                    />
+                    <IconButton
+                      disabled={key === 'Lead'}
+                      onClick={() => handleDelete(index)}
+                    >
+                      <DeleteIcon
+                        style={{ color: key === 'Lead' ? 'grey' : 'red' }}
+                      />
+                    </IconButton>
+                  </div>
+                )),
+              )
+            ) : (
+              <></>
+            )}
           </FormControl>
         </div>
         <Button
