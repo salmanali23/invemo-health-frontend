@@ -57,7 +57,16 @@ export const createMember = async (data) => {
     const response = await axios.post(`${BASE_URL}/api/v1/members`, data);
     return response.data;
   } catch (error) {
-    throw new Error('Error creating opportunities', error);
+    throw new Error('Error creating member', error);
+  }
+};
+
+export const updateMember = async (id, data) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/api/v1/member/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw new Error('Error updating member', error);
   }
 };
 

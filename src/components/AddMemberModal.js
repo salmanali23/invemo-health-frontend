@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Modal from '@mui/material/Modal';
 import styled from 'styled-components';
 import TextField from '@mui/material/TextField';
@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
-import { createMember } from '../services/api';
+import { createMember, updateMember } from '../services/api';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AppContext } from '../context/AppContext';
@@ -111,12 +111,14 @@ const ModalFooter = styled.div`
   }
 `;
 
-const AddMemberModal = ({ isVisible, onClose }) => {
+// TODO need to add a members index page from where this edit modal will be callled, passing that member.
+const AddMemberModal = ({ isVisible, onClose, isEdit = true, memberData }) => {
   const { setDoctors, setPatients } = useContext(AppContext);
   const [avatar, setAvatar] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState('Avatar.svg');
   const { t } = useTranslation();
+  console.log(memberData.avatar, 'member');
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -132,6 +134,19 @@ const AddMemberModal = ({ isVisible, onClose }) => {
     return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
+  useEffect(() => {
+    if (isEdit && memberData) {
+      formik.setValues({
+        gender: memberData.gender,
+        first_name: memberData.first_name,
+        last_name: memberData.last_name,
+        role: memberData.role,
+        dob: memberData.dob,
+      });
+      setImageUrl(memberData.avatar);
+    }
+  }, [isEdit, memberData]);
+
   const handleOnSubmit = async (values) => {
     try {
       setSubmitting(true);
@@ -142,8 +157,12 @@ const AddMemberModal = ({ isVisible, onClose }) => {
       formData.append('member[gender]', values.gender);
       formData.append('member[role]', values.role);
       formData.append('member[age]', calculateAge(values.dob));
-
-      const response = await createMember(formData);
+      let response;
+      if (isEdit) {
+        response = await updateMember(memberData.id, formData);
+      } else {
+        response = await createMember(formData);
+      }
       if (response.member.role === 'patient') {
         setPatients((old) => [...old, response.member]);
       } else {
@@ -154,6 +173,7 @@ const AddMemberModal = ({ isVisible, onClose }) => {
       console.error('Error:', error);
     } finally {
       setSubmitting(false);
+      onClose();
     }
   };
 
@@ -199,7 +219,9 @@ const AddMemberModal = ({ isVisible, onClose }) => {
       <Container>
         <ModalHead>
           <ModalTitle id="add-member-modal-title">
-            {[t('Add'), t('Member')].join(' ')}
+            {isEdit
+              ? [t('Edit'), t('Member')].join(' ')
+              : [t('Add'), t('Member')].join(' ')}
           </ModalTitle>
           <IconButton onClick={onClose}>
             <CloseIcon />

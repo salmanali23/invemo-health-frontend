@@ -61,6 +61,7 @@ export default function PatientBoard() {
   const [treated, setTreated] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const { opportunities, loading } = React.useContext(AppContext);
+  const { patients } = React.useContext(AppContext); //To test member edit modal
   const { t } = useTranslation();
   const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
 
@@ -210,6 +211,7 @@ export default function PatientBoard() {
         <AddMemberModal
           isVisible={isAddMemberModalOpen}
           onClose={handleCloseAddMemberModal}
+          memberData={patients[1]}
         />
       )}
       {!loading ? (
