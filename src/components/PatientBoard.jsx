@@ -5,6 +5,7 @@ import {
   Button,
   TextField,
   InputAdornment,
+  Container,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Column from './Column';
@@ -14,6 +15,9 @@ import { Typography } from '@mui/material';
 import { AppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import Loader from './Loader';
+import LanguageSelector from './LanguageSelector';
+import SwipeableViews from 'react-swipeable-views';
+import { useMediaQuery } from '@mui/material';
 
 const SubHeader = styled.div`
   padding: 20px;
@@ -24,10 +28,17 @@ const SubHeader = styled.div`
 
   @media (max-width: 767px) {
     padding: 10px;
-    flex-direction:column;
+    flex-direction: column;
   }
 `;
 
+const StyledButton = styled(Button)`
+  border-radius: 20px;
+  @media (max-width: 767px) {
+    border-radius: 16px;
+    font-size: x-small;
+  }
+`;
 
 const ColumnsContainer = styled.div`
   display: flex;
@@ -51,6 +62,7 @@ export default function PatientBoard() {
   const [searchValue, setSearchValue] = useState('');
   const { opportunities, loading } = React.useContext(AppContext);
   const { t } = useTranslation();
+  const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
 
   const handleOpenAddMember = () => {
     toggleAddMemberModalOpen(true);
@@ -88,7 +100,6 @@ export default function PatientBoard() {
         });
 
         filteredOpportunites.forEach((data) => {
-          console.log(data)
           const stages = data?.stage_history;
           if (stages) {
             const lastStage = stages[stages.length - 1];
@@ -140,19 +151,16 @@ export default function PatientBoard() {
           />
           <span style={{ fontSize: '1.2em', color: 'black' }}>Pulse</span>
         </Toolbar>
+        <LanguageSelector />
       </AppBar>
       <SubHeader>
         <Typography fontSize={22} fontWeight={600}>
           {t('Patients')}
         </Typography>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <Button
-            variant="contained"
-            onClick={handleOpenAddMember}
-            style={{ borderRadius: '20px' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <StyledButton variant="contained" onClick={handleOpenAddMember}>
             {[t('Add'), t('Member')].join(' ')}
-          </Button>
+          </StyledButton>
           <TextField
             InputProps={{
               startAdornment: (
@@ -205,12 +213,31 @@ export default function PatientBoard() {
         />
       )}
       {!loading ? (
-        <ColumnsContainer>
-          <Column title={t('Leads')} tasks={lead} />
-          <Column title={t('Qualified')} tasks={qualified} />
-          <Column title={t('Booked')} tasks={booked} />
-          <Column title={t('Treated')} tasks={treated} />
-        </ColumnsContainer>
+        isMobile ? (
+          <Container>
+            <SwipeableViews axis="x">
+              <div>
+                <Column title={t('Leads')} tasks={lead} />
+              </div>
+              <div>
+                <Column title={t('Qualified')} tasks={qualified} />
+              </div>
+              <div>
+                <Column title={t('Booked')} tasks={booked} />
+              </div>
+              <div>
+                <Column title={t('Treated')} tasks={treated} />
+              </div>
+            </SwipeableViews>
+          </Container>
+        ) : (
+          <ColumnsContainer>
+            <Column title={t('Leads')} tasks={lead} />
+            <Column title={t('Qualified')} tasks={qualified} />
+            <Column title={t('Booked')} tasks={booked} />
+            <Column title={t('Treated')} tasks={treated} />
+          </ColumnsContainer>
+        )
       ) : (
         <Loader />
       )}

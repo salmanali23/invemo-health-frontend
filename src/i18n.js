@@ -31,6 +31,7 @@ const resources = {
       Female: 'Female',
       Other: 'Other',
       Patient: 'Patient',
+      YearOld: 'years old',
     },
   },
   es: {
@@ -62,20 +63,17 @@ const resources = {
       Female: 'Mujer',
       Other: 'Otro',
       Patient: 'Paciente',
+      YearOld: 'años de edad',
     },
   },
 };
-i18n
-  .use(initReactI18next)
-
-  .init({
-    resources,
-    lng: navigator.language,
-    interpolation: {
-      escapeValue: false,
-    },
-
-    debug: false,
-  });
+i18n.use(initReactI18next).init({
+  resources,
+  lng: navigator.language,
+  interpolation: {
+    escapeValue: false,
+  },
+  debug: false,
+});
 
 export default i18n;

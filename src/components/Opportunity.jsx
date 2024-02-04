@@ -14,6 +14,7 @@ import { Edit, SkipNext } from '@mui/icons-material';
 import { updateOpportunity } from '../services/api';
 import AddOpportunityModal from './AddOpportunityModal';
 import { AppContext } from '../context/AppContext';
+import { useTranslation } from 'react-i18next';
 
 const CardHeaderStyle = styled.div`
   display: flex;
@@ -22,6 +23,7 @@ const CardHeaderStyle = styled.div`
 `;
 
 const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
+  const { t } = useTranslation();
   const [isEditOpportunityModalOpen, toggleEditOpportunityModalOpen] =
     useState(false);
   const { opportunities, setOpportunities } = useContext(AppContext);
@@ -74,9 +76,9 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+      minute: '2-digit',
+    });
+  };
 
   const handleClickEdit = () => {
     toggleEditOpportunityModalOpen(true);
@@ -112,7 +114,11 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
                 (opportunity?.patient?.last_name || '')}
             </Typography>
             <Typography fontSize={12} color="#4D4D4D">
-              {opportunity?.patient?.gender ? opportunity.patient.gender.charAt(0).toUpperCase() + opportunity.patient.gender.slice(1) : ''}, {opportunity?.patient?.age} years old
+              {opportunity?.patient?.gender
+                ? opportunity.patient.gender.charAt(0).toUpperCase() +
+                  opportunity.patient.gender.slice(1)
+                : ''}
+              , {opportunity?.patient?.age} {t('YearOld')}
             </Typography>
           </div>
         </CardHeaderStyle>
@@ -137,7 +143,11 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
                 <div key={index}>
                   {Object.entries(stage).map(([key, value]) => (
                     <Typography
-                      key={key} variant="body2" color="textSecondary" sx={{ display: 'inline',  whiteSpace: 'nowrap'  }}>
+                      key={key}
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ display: 'inline', whiteSpace: 'nowrap' }}
+                    >
                       {key}: {parseDate(value)}
                     </Typography>
                   ))}

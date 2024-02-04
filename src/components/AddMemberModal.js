@@ -26,7 +26,8 @@ const Container = styled.div`
   @media (max-width: 767px) {
     width: 100%;
     max-width: 100%;
-    border-radius: 20px;
+    border-radius: 0px;
+    margin: 22px;
   }
 `;
 
@@ -91,7 +92,10 @@ const FormRowHorizontal = styled.div`
   .MuiFormControl-root {
     margin-right: 10px;
     margin-bottom: 10px;
-    flex: 1; /* This ensures each field takes equal space */
+    flex: 1;
+  }
+  @media (max-width: 767px) {
+    flex-direction: column;
   }
 `;
 
