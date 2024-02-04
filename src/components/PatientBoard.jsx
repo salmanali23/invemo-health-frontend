@@ -18,6 +18,7 @@ import Loader from './Loader';
 import LanguageSelector from './LanguageSelector';
 import SwipeableViews from 'react-swipeable-views';
 import { useMediaQuery } from '@mui/material';
+import AddQuoteModal from './AddQuoteModal';
 
 const SubHeader = styled.div`
   padding: 20px;
@@ -55,6 +56,8 @@ const ColumnsContainer = styled.div`
 
 export default function PatientBoard() {
   const [isAddMemberModalOpen, toggleAddMemberModalOpen] = useState(false);
+  const [isAddQuoteModalOpen, toggleAddQuoteModalOpen] = useState(false);
+
   const [lead, setLead] = useState([]);
   const [qualified, setQualified] = useState([]);
   const [booked, setBooked] = useState([]);
@@ -72,6 +75,13 @@ export default function PatientBoard() {
     toggleAddMemberModalOpen(false);
   };
 
+  const handleOpenAddQuote = () => {
+    toggleAddQuoteModalOpen(true);
+  };
+
+  const handleCloseAddQuote = () => {
+    toggleAddQuoteModalOpen(false);
+  };
   const handleSearchChange = useCallback(
     async (searchText) => {
       try {
@@ -161,6 +171,9 @@ export default function PatientBoard() {
           <StyledButton variant="contained" onClick={handleOpenAddMember}>
             {[t('Add'), t('Member')].join(' ')}
           </StyledButton>
+          <StyledButton variant="contained" onClick={handleOpenAddQuote}>
+            {[t('Add'), t('Quote')].join(' ')}
+          </StyledButton>
           <TextField
             InputProps={{
               startAdornment: (
@@ -210,6 +223,12 @@ export default function PatientBoard() {
         <AddMemberModal
           isVisible={isAddMemberModalOpen}
           onClose={handleCloseAddMemberModal}
+        />
+      )}
+      {isAddQuoteModalOpen && (
+        <AddQuoteModal
+          visible={isAddQuoteModalOpen}
+          onClose={handleCloseAddQuote}
         />
       )}
       {!loading ? (

@@ -32,6 +32,7 @@ const resources = {
       Other: 'Other',
       Patient: 'Patient',
       YearOld: 'years old',
+      Quote: 'Quote',
     },
   },
   es: {
@@ -64,6 +65,7 @@ const resources = {
       Other: 'Otro',
       Patient: 'Paciente',
       YearOld: 'años de edad',
+      Quote: 'Quote',
     },
   },
 };
