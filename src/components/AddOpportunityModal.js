@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { useFormik } from 'formik';
 import styled from 'styled-components';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete'; // Import DeleteIcon
+import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Modal from 'react-modal';
 import * as Yup from 'yup';
@@ -58,6 +58,7 @@ const AddOpportunityModal = ({
       procedureName: opportunity?.procedure_name,
       selectedPatient: opportunity?.patient?.id,
       selectedDoctor: opportunity?.doctor?.id,
+      stageHistory: opportunity?.stage_history,
     },
     validationSchema: Yup.object({
       procedureName: Yup.string().required(
