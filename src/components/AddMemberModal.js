@@ -163,9 +163,7 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
         role: memberData.role,
         dob: calculateAge(memberData.age, 'dobToString'),
       });
-      setImageUrl(
-        memberData.avatar.url !== null ? memberData.avatar.url : 'Avatar.svg',
-      );
+      setImageUrl(memberData.avatar.url ?? 'Avatar.svg');
     }
   }, [isEdit, memberData]);
 
@@ -196,6 +194,9 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
           newMember[index] = editedMember.member;
           setDoctors([...newMember]);
         }
+        const opportunitiesData = await searchOpportunity('');
+        setOpportunities([...opportunitiesData]);
+        setSubmitting(false);
       } else {
         const response = await createMember(formData);
         if (response.member.role === 'patient') {
@@ -207,9 +208,6 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
     } catch (error) {
       console.error('Error:', error);
     } finally {
-      const opportunitiesData = await searchOpportunity('');
-      setOpportunities([...opportunitiesData]);
-      setSubmitting(false);
       onClose();
     }
   };
@@ -331,27 +329,29 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
               helperText={formik.touched.last_name && formik.errors.last_name}
             />
           </FormRow>
-          <FormRow>
-            <TextField
-              id="role"
-              select
-              label={t('Role')}
-              variant="outlined"
-              name="role"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              fullWidth
-              value={formik.values.role}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.role && Boolean(formik.errors.role)}
-              helperText={formik.touched.role && formik.errors.role}
-            >
-              <MenuItem value="doctor">{t('Doctor')}</MenuItem>
-              <MenuItem value="patient">{t('Patient')}</MenuItem>
-            </TextField>
-          </FormRow>
+          {!isEdit && (
+            <FormRow>
+              <TextField
+                id="role"
+                select
+                label={t('Role')}
+                variant="outlined"
+                name="role"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                fullWidth
+                value={formik.values.role}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.role && Boolean(formik.errors.role)}
+                helperText={formik.touched.role && formik.errors.role}
+              >
+                <MenuItem value="doctor">{t('Doctor')}</MenuItem>
+                <MenuItem value="patient">{t('Patient')}</MenuItem>
+              </TextField>
+            </FormRow>
+          )}
           <FormRowHorizontal>
             <TextField
               id="gender"
