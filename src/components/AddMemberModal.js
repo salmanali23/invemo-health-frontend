@@ -111,14 +111,12 @@ const ModalFooter = styled.div`
   }
 `;
 
-// TODO need to add a members index page from where this edit modal will be callled, passing that member.
-const AddMemberModal = ({ isVisible, onClose, isEdit = true, memberData }) => {
+const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
   const { setDoctors, setPatients } = useContext(AppContext);
   const [avatar, setAvatar] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState('Avatar.svg');
   const { t } = useTranslation();
-  console.log(memberData.avatar, 'member');
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -127,11 +125,31 @@ const AddMemberModal = ({ isVisible, onClose, isEdit = true, memberData }) => {
     setImageUrl(url);
   };
 
-  const calculateAge = (dobString) => {
-    const dobDate = new Date(dobString);
-    const ageDiffMs = Date.now() - dobDate.getTime();
-    const ageDate = new Date(ageDiffMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  const convertDate = (value) => {
+    const date = new Date(value);
+    const year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    if (month < 10) {
+      month = '0' + month;
+    }
+    let day = date.getDate();
+    if (day < 10) {
+      day = '0' + day;
+    }
+    return `${year}-${month}-${day}`;
+  };
+
+  const calculateAge = (value, targetType) => {
+    if (targetType === 'dobToString') {
+      return convertDate(value);
+    } else if (targetType === 'stringToAge') {
+      const dobDate = new Date(value);
+      const ageDiffMs = Date.now() - dobDate.getTime();
+      const ageDate = new Date(ageDiffMs);
+      return Math.abs(ageDate.getUTCFullYear() - 1970);
+    } else {
+      throw new Error('Invalid targetType');
+    }
   };
 
   useEffect(() => {
@@ -141,7 +159,7 @@ const AddMemberModal = ({ isVisible, onClose, isEdit = true, memberData }) => {
         first_name: memberData.first_name,
         last_name: memberData.last_name,
         role: memberData.role,
-        dob: memberData.dob,
+        dob: calculateAge(memberData.age, 'dobToString'),
       });
       setImageUrl(memberData.avatar);
     }
@@ -156,7 +174,7 @@ const AddMemberModal = ({ isVisible, onClose, isEdit = true, memberData }) => {
       formData.append('member[last_name]', values.last_name);
       formData.append('member[gender]', values.gender);
       formData.append('member[role]', values.role);
-      formData.append('member[age]', calculateAge(values.dob));
+      formData.append('member[age]', calculateAge(values.dob, 'stringToAge'));
       let response;
       if (isEdit) {
         response = await updateMember(memberData.id, formData);

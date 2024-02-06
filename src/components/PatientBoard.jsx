@@ -211,7 +211,7 @@ export default function PatientBoard() {
         <AddMemberModal
           isVisible={isAddMemberModalOpen}
           onClose={handleCloseAddMemberModal}
-          memberData={patients[1]}
+          isEdit={false}
         />
       )}
       {!loading ? (

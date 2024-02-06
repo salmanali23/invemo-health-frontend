@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import AddMemberModal from './AddMemberModal';
 import {
   Typography,
   CardContent,
@@ -26,7 +27,20 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
   const { t } = useTranslation();
   const [isEditOpportunityModalOpen, toggleEditOpportunityModalOpen] =
     useState(false);
+  const [isAddMemberModalOpen, toggleAddMemberModalOpen] = useState(false);
   const { opportunities, setOpportunities } = useContext(AppContext);
+  const [memberData, setMemberData] = useState();
+  const handleOpenAddMember = (role) => {
+    console.log(role, 'role');
+    role === 'doctor'
+      ? setMemberData(opportunity.doctor)
+      : setMemberData(opportunity.patient);
+    toggleAddMemberModalOpen(true);
+  };
+
+  const handleCloseAddMemberModal = () => {
+    toggleAddMemberModalOpen(false);
+  };
 
   const handleChangeStage = async () => {
     let updatedStage = [];
@@ -107,12 +121,17 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
             />
           </div>
           <div>
-            <Typography fontSize={14}>
-              {' '}
-              {(opportunity?.patient?.first_name || '') +
-                ' ' +
-                (opportunity?.patient?.last_name || '')}
-            </Typography>
+            <Box
+              sx={{ cursor: 'pointer' }}
+              onClick={() => handleOpenAddMember('patient')}
+            >
+              <Typography fontSize={14}>
+                {' '}
+                {(opportunity?.patient?.first_name || '') +
+                  ' ' +
+                  (opportunity?.patient?.last_name || '')}
+              </Typography>
+            </Box>
             <Typography fontSize={12} color="#4D4D4D">
               {opportunity?.patient?.gender
                 ? opportunity.patient.gender.charAt(0).toUpperCase() +
@@ -131,14 +150,19 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
               >
                 {opportunity?.procedure_name}
               </Typography>
-              <Typography
-                sx={{ fontSize: '14px', fontWeight: 'font-weight: 400;' }}
-                gutterBottom
+              <Box
+                sx={{ cursor: 'pointer' }}
+                onClick={() => handleOpenAddMember('doctor')}
               >
-                {(opportunity?.doctor?.first_name || '') +
-                  ' ' +
-                  (opportunity?.doctor?.last_name || '')}
-              </Typography>
+                <Typography
+                  sx={{ fontSize: '14px', fontWeight: 'font-weight: 400;' }}
+                  gutterBottom
+                >
+                  {(opportunity?.doctor?.first_name || '') +
+                    ' ' +
+                    (opportunity?.doctor?.last_name || '')}
+                </Typography>
+              </Box>
               {opportunity?.stage_history?.map((stage, index) => (
                 <div key={index}>
                   {Object.entries(stage).map(([key, value]) => (
@@ -186,6 +210,14 @@ const Opportunity = ({ opportunity, doctors, patients, isLoading }) => {
           patients={patients}
         ></AddOpportunityModal>
       ) : null}
+      {isAddMemberModalOpen && (
+        <AddMemberModal
+          isVisible={isAddMemberModalOpen}
+          onClose={handleCloseAddMemberModal}
+          isEdit={true}
+          memberData={memberData}
+        />
+      )}
     </div>
   );
 };
