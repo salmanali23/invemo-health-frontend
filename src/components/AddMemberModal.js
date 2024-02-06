@@ -11,6 +11,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
+import { searchOpportunity } from '../services/api';
 
 const Container = styled.div`
   display: flex;
@@ -112,7 +113,8 @@ const ModalFooter = styled.div`
 `;
 
 const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
-  const { setDoctors, setPatients } = useContext(AppContext);
+  const { setDoctors, setPatients, patients, doctors, setOpportunities } =
+    useContext(AppContext);
   const [avatar, setAvatar] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState('Avatar.svg');
@@ -161,7 +163,9 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
         role: memberData.role,
         dob: calculateAge(memberData.age, 'dobToString'),
       });
-      setImageUrl(memberData.avatar);
+      setImageUrl(
+        memberData.avatar.url !== null ? memberData.avatar.url : 'Avatar.svg',
+      );
     }
   }, [isEdit, memberData]);
 
@@ -175,21 +179,36 @@ const AddMemberModal = ({ isVisible, onClose, isEdit, memberData }) => {
       formData.append('member[gender]', values.gender);
       formData.append('member[role]', values.role);
       formData.append('member[age]', calculateAge(values.dob, 'stringToAge'));
-      let response;
       if (isEdit) {
-        response = await updateMember(memberData.id, formData);
+        const editedMember = await updateMember(memberData.id, formData);
+        if (editedMember.member.role === 'patient') {
+          const index = patients.findIndex(
+            (member) => member.id === editedMember.member.id,
+          );
+          const newMem = [...patients];
+          newMem[index] = editedMember.member;
+          setPatients([...newMem]);
+        } else {
+          const index = doctors.findIndex(
+            (member) => member.id === editedMember.member.id,
+          );
+          const newMember = [...doctors];
+          newMember[index] = editedMember.member;
+          setDoctors([...newMember]);
+        }
       } else {
-        response = await createMember(formData);
+        const response = await createMember(formData);
+        if (response.member.role === 'patient') {
+          setPatients((old) => [...old, response.member]);
+        } else {
+          setDoctors((old) => [...old, response.member]);
+        }
       }
-      if (response.member.role === 'patient') {
-        setPatients((old) => [...old, response.member]);
-      } else {
-        setDoctors((old) => [...old, response.member]);
-      }
-      onClose();
     } catch (error) {
       console.error('Error:', error);
     } finally {
+      const opportunitiesData = await searchOpportunity('');
+      setOpportunities([...opportunitiesData]);
       setSubmitting(false);
       onClose();
     }
